@@ -1,0 +1,39 @@
+import React from 'react'
+import { useEffect } from 'react'
+import { useNavigate,useLocation } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import './App.css'
+import Login from './Pages/Authentication/Login/Login'
+import Register from './Pages/Authentication/Register/Register'
+import Profile from './Pages/Profile/Profile'
+import Logout from './Components/Logout'
+
+function App() {
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      localStorage.setItem('token', token);
+      navigate('/profile', { replace: true });
+    }
+  }, [location,navigate]);
+
+  return (
+    <div>
+      <h1>Hello</h1>
+      <Logout/>
+      <Routes>
+      <Route path="/login" element={<Login/>} />
+				<Route path="/register" element={<Register/>} />
+				<Route path="/profile" element={<Profile/>} />
+			</Routes>
+    </div>
+  )
+}
+
+export default App
