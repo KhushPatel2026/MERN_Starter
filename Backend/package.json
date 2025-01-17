@@ -9,7 +9,11 @@
     "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.3",
+    "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
+    "passport-github": "^1.1.0",
+    "passport-github-oauth20": "^1.0.4",
+    "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0"
   }
 }

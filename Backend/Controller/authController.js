@@ -5,12 +5,22 @@ const bcrypt = require('bcryptjs');
 const register = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        await User.create({
+        const user = await User.create({
             name: req.body.name,
             email: req.body.email,
             password: hashedPassword,
         });
-        res.json({ status: 'ok' });
+
+        const token = jwt.sign(
+            {
+                name: user.name,
+                email: user.email,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '12h' }
+        );
+
+        return res.json({ status: 'ok', user: token });
     } catch (err) {
         res.json({ status: 'error', error: 'Duplicate email' });
     }

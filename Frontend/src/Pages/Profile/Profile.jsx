@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const urlToken = urlParams.get('token');
+
+    if (urlToken) {
+      localStorage.setItem('token', urlToken);
+      navigate('/profile', { replace: true }); // Clean URL by removing the token parameter
+    }
+  }, [location, navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -13,26 +24,30 @@ const Profile = () => {
       return;
     }
 
-    const verifyToken = async () => {
+    const verifyToken = async (retryCount = 0) => {
       try {
         const response = await fetch('http://localhost:3000/api/auth/verify-token', {
           headers: {
-            'x-access-token': token
-          }
+            'x-access-token': token,
+          },
         });
         const data = await response.json();
 
         if (data.status !== 'ok') {
-          alert(data.error);
-          localStorage.removeItem('token');
-          navigate('/login');
+          if (retryCount < 3) {
+            setTimeout(() => verifyToken(retryCount + 1), 5000);
+          } else {
+            alert(data.error || 'Invalid token');
+            localStorage.removeItem('token');
+            navigate('/login');
+          }
           return;
         }
 
         const profileResponse = await fetch('http://localhost:3000/api/profile', {
           headers: {
-            'x-access-token': token
-          }
+            'x-access-token': token,
+          },
         });
         const profileData = await profileResponse.json();
 
@@ -46,9 +61,13 @@ const Profile = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error verifying token or fetching profile:', error);
-        alert('An error occurred. Please try again.');
-        localStorage.removeItem('token');
-        navigate('/login');
+        if (retryCount < 3) {
+          setTimeout(() => verifyToken(retryCount + 1), 5000);
+        } else {
+          alert('An error occurred. Please try again.');
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
       }
     };
 
@@ -65,13 +84,13 @@ const Profile = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': token
+          'x-access-token': token,
         },
         body: JSON.stringify({
           name: form.name.value,
           email: form.email.value,
-          password: form.password.value
-        })
+          password: form.password.value,
+        }),
       });
 
       const data = await response.json();

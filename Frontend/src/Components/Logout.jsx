@@ -9,9 +9,12 @@ const Logout = () => {
         navigate('/login'); 
     };
 
-    return (
-        <button onClick={handleLogout}>Logout</button>
-    );
+    if(localStorage.getItem('token')!==null){
+        return (
+            <button onClick={handleLogout}>Logout</button>
+        );
+    }
+
 };
 
 export default Logout;

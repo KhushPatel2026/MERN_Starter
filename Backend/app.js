@@ -6,9 +6,9 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
-const googleRoutes = require('./Routes/googleRoute')
+const socialAuthRoutes = require('./Routes/socialAuthRoute')
 const MONGO_URL = process.env.MONGO_URL;
-const passport = require('./passportConfig');
+const passport = require('./Utils/passportConfig');
 const session = require('express-session');
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
@@ -34,7 +34,7 @@ mongoose.connect(MONGO_URL)
 
 app.use('/api/auth', authRoutes);
 app.use('/api', profileRoutes);
-app.use('/auth', googleRoutes);
+app.use('/auth', socialAuthRoutes);
 
 app.listen(3000, () => {
   console.log('Server started on 3000');

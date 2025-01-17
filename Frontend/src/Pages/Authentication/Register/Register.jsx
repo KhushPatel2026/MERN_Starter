@@ -23,11 +23,16 @@ function Register() {
             }),
         })
 
+        console.log(response)
+
         const data = await response.json()
 
-        if (data.status === 'ok') {
-            navigate('/login')
-        }
+        console.log(data)
+
+		if (data.user) {
+			localStorage.setItem('token', data.user)
+			window.location.href = '/profile'
+		}
     }
 
     return (
